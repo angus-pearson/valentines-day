@@ -3,9 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World</title>
+    <title>PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS PLS </title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            border-radius: 20px;
+            background-color: #f5f5f5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .message {
+            font-size: 48px;
+            margin-bottom: 30px;
+            font-weight: bold;
+            /* padding-bottom: 100px; */
+        }
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            min-height: 60px;
+            position: relative;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .no-button-spacer {
+            visibility: hidden;
+        }
+        .no-button {
+            position: absolute;
+            transition: all 0.1s ease;
+        }
+        .yes-button {
+            background-color: #4CAF50;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        .yes-button:hover {
+            background-color: #45a049;
+        }
+        .no-button {
+            background-color: #f44336;
+            color: white;
+        }
+        .no-button:hover {
+            background-color: #da190b;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World</h1>
+    <div class="container">
+        <div class="message">Will you be my valentine??</div>
+        <div class="buttons">
+            <button class="yes-button">Yes 🥰</button>
+            <button class="no-button-spacer">No 😔</button>
+            <button class="no-button">No 😔</button>
+        </div>
+    </div>
+    <script>
+        const noButton = document.querySelector('.no-button');
+        const noButtonSpacer = document.querySelector('.no-button-spacer');
+        const yesButton = document.querySelector('.yes-button');
+        const buttonsContainer = document.querySelector('.buttons');
+        const mainContainer = document.querySelector('.container');
+
+        // Set initial position of No button to match the invisible spacer
+        function setInitialPosition() {
+            noButton.style.left = noButtonSpacer.offsetLeft + 'px';
+            noButton.style.top = noButtonSpacer.offsetTop + 'px';
+        }
+
+        // Set initial position when page loads
+        window.addEventListener('load', setInitialPosition);
+        // Also set it after a short delay to ensure layout is complete
+        setTimeout(setInitialPosition, 0);
+
+        function jumpToRandomPosition(event) {
+            const containerRect = mainContainer.getBoundingClientRect();
+            const buttonRect = noButton.getBoundingClientRect();
+
+            // Get container's computed padding
+            const containerStyle = window.getComputedStyle(mainContainer);
+            const paddingTop = parseFloat(containerStyle.paddingTop);
+            const paddingLeft = parseFloat(containerStyle.paddingLeft);
+            const paddingRight = parseFloat(containerStyle.paddingRight);
+            const paddingBottom = parseFloat(containerStyle.paddingBottom);
+
+            // Calculate available space within the container's content area (after padding)
+            // Absolute positioning is relative to the padding box, so we use the content dimensions
+            const contentWidth = containerRect.width - paddingLeft - paddingRight;
+            const contentHeight = containerRect.height - paddingTop - paddingBottom;
+            const maxX = contentWidth - buttonRect.width;
+            const maxY = contentHeight - buttonRect.height;
+
+            // Get mouse position relative to the container's content area (after padding)
+            const mouseX = event.clientX - containerRect.left - paddingLeft;
+            const mouseY = event.clientY - containerRect.top - paddingTop;
+
+            // Get a random position that's not where the mouse is
+            const { x: randomX, y: randomY } = getNextCoords(buttonRect, maxX, maxY, mouseX, mouseY);
+
+            // Set the new position (absolute positioning is already relative to padding box)
+            noButton.style.left = randomX + 'px';
+            noButton.style.top = randomY + 'px';
+        }
+
+        function getNextCoords(buttonRect, maxX, maxY, mouseX, mouseY) {
+            // Add a buffer around the mouse position to avoid placing button too close
+            const buffer = 50;
+
+            let randomX, randomY;
+            let attempts = 0;
+            const maxAttempts = 50;
+
+            do {
+                // Generate random position within bounds
+                randomX = Math.random() * maxX;
+                randomY = Math.random() * maxY;
+                attempts++;
+
+                // Check if the button would overlap with mouse position (with buffer)
+                const buttonCenterX = randomX + buttonRect.width / 2;
+                const buttonCenterY = randomY + buttonRect.height / 2;
+                const distanceFromMouse = Math.sqrt(
+                    Math.pow(buttonCenterX - mouseX, 2) + Math.pow(buttonCenterY - mouseY, 2)
+                );
+
+                // If far enough from mouse, use this position
+                if (distanceFromMouse > buffer) {
+                    break;
+                }
+            } while (attempts < maxAttempts);
+
+            return { x: randomX, y: randomY };
+        }
+
+        let yesButtonScale = 1;
+
+        function onNoClick(event) {
+            // Move the no button to a random position
+            jumpToRandomPosition(event);
+
+            // Increase the yes button size slightly
+            yesButtonScale += 0.1;
+            yesButton.style.transform = `scale(${yesButtonScale})`;
+        }
+
+        // Add event listeners for both hover and click
+        noButton.addEventListener('mouseenter', jumpToRandomPosition);
+        noButton.addEventListener('click', onNoClick);
+
+        // Navigate to /yippee when Yes button is clicked
+        yesButton.addEventListener('click', function() {
+            window.location.href = '/yippee';
+        });
+    </script>
 </body>
 </html>
